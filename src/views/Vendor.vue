@@ -8,7 +8,7 @@
         </v-btn>
       </v-toolbar-side-icon>
 
-      <v-toolbar-title>Detail</v-toolbar-title>
+      <v-toolbar-title>Jumbo Restaurant</v-toolbar-title>
 
       <v-spacer></v-spacer>
 

@@ -105,7 +105,7 @@
 
               <v-card-actions>
                 <v-list-item class="grow">
-                  <v-btn outlined color="black"> Pesan Sekarang </v-btn>
+                  <v-btn outlined color="black"> Tambahkan </v-btn>
                 </v-list-item>
               </v-card-actions>
             </v-card>

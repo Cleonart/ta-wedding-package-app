@@ -2,13 +2,8 @@
   <v-card class="mx-auto">
     <!-- Toolbar -->
     <v-toolbar color="#D7CCC8">
-      <v-toolbar-side-icon>
-        <v-btn icon color="black">
-          <v-icon dark> mdi-chevron-left </v-icon>
-        </v-btn>
-      </v-toolbar-side-icon>
 
-      <v-toolbar-title>Detail</v-toolbar-title>
+      <v-toolbar-title>Aplikasi Wedding</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
