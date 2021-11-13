@@ -28,19 +28,58 @@
           {{ formatRupiah(item.price, "Rp. ") }}
         </v-card-subtitle>
         <v-card-actions>
-          <v-btn class="ml-2 mt-1 mb-3" outlined rounded small
-            >Buka Paket</v-btn
+          <v-btn
+            class="ml-2 mt-1 mb-3"
+            outlined
+            rounded
+            small
+            @click="direct(item.id)"
+            >Buka Paket
+          </v-btn>
+          <v-btn
+            class="ml-2 mt-1 mb-3"
+            outlined
+            rounded
+            small
+            @click="openSheet(item)"
+            >Sekilas</v-btn
           >
         </v-card-actions>
       </div>
     </div>
+
+    <!-- Bottom Sheet -->
+    <v-bottom-sheet v-model="sheet">
+      <v-sheet height="200px">
+        <v-icon class="text-right" small color="red darken-2">
+          mdi-close
+        </v-icon>
+        <div class="my-3">
+          <p>{{ selected_data.title }}</p>
+          <p>{{ selected_data.detail }}</p>
+        </div>
+      </v-sheet>
+    </v-bottom-sheet>
   </v-card>
 </template>
 
 <script>
 export default {
   props: ["item"],
+  data() {
+    return {
+      sheet: false,
+      selected_data: {},
+    };
+  },
   methods: {
+    openSheet: function (selected) {
+      this.sheet = true;
+      this.selected_data = selected;
+    },
+    direct: function (id) {
+      this.$router.replace("detail");
+    },
     formatRupiah: function (angka, prefix) {
       angka = angka.toString();
       var number_string = angka.replace(/[^,\d]/g, "").toString();
