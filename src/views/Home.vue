@@ -1,122 +1,141 @@
 <template>
-  <v-card class="mx-auto">
-    <!-- Toolbar -->
-    <v-toolbar color="#D7CCC8">
+  <v-card class="mx-auto" style="overflow-x: hidden">
+    <p
+      style="
+        font-family: 'Serif';
+        text-align: center;
+        border-bottom: 1px solid black;
+      "
+      class="py-3"
+    >
+      <img src="@/assets/pic.png" style="width: 120px" />
 
-      <v-toolbar-title>Aplikasi Wedding</v-toolbar-title>
+      <v-avatar
+        style="
+          font-family: 'Sans-Serif';
+          position: absolute;
+          left: 15px;
+          top: 12px;
+        "
+        color="primary"
+        size="32"
+        ><img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John"
+      /></v-avatar>
 
-      <v-spacer></v-spacer>
+      <!-- Cart Badge [Top Right] -->
+      <v-badge
+        :content="cart"
+        :value="cart"
+        style="position: absolute; right: 15px; top: 15px"
+        color="red"
+        overlap
+      >
+        <v-icon medium> mdi-cart </v-icon>
+      </v-badge>
+    </p>
+    <v-container>
+      <!-- Top Subtitle -->
+      <div class="top-header mb-5">
+        <h2 class="h1">Halo, Pengguna</h2>
+        <p class="subtitle-2" style="opacity: 0.7; font-weight: normal">
+          Your trusworthy wedding partner
+        </p>
+      </div>
 
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-    </v-toolbar>
+      <swiper :options="swiperOption">
+        <swiper-slide v-for="categ in categories" :key="categ">
+          <v-chip outlined>{{ categ }}</v-chip>
+        </swiper-slide>
+      </swiper>
 
-    <v-container fluid>
+      <!-- Search Field -->
+      <v-text-field
+        label="Cari Kategori"
+        required
+        append-icon="mdi-magnify"
+      ></v-text-field>
+
       <v-row dense>
-        <v-col v-for="(item, i) in items" :key="i" :cols="item.col">
-          <v-card v-if="item.status == 'Favorite'" color="#D7CCC8">
-            <v-img class="white--text align-end" height="200px" :src="item.img">
-            </v-img>
-
-            <v-card-title v-text="item.title"></v-card-title>
-
-            <v-card-subtitle v-text="item.detail"></v-card-subtitle>
-
+        <v-col cols="12">
+          <v-card color="#385F73" dark>
+            <v-card-title class="text-h6">
+              Pilihan Tanpa Batas Bisa
+            </v-card-title>
+            <v-card-subtitle>
+              Cari paket pernikahan sesuai dengan yang anda inginkan tanpa perlu
+              repot kesana kemari
+            </v-card-subtitle>
             <v-card-actions>
-              <v-list-item class="grow">
-                <v-list-item-avatar color="grey darken-3">
-                  <v-img class="elevation-6" :src="item.src"> </v-img>
-                </v-list-item-avatar>
-
-                <v-list-item-content>
-                  <v-list-item-title v-text="item.vendor"></v-list-item-title>
-                </v-list-item-content>
-
-                <v-row align="center" justify="end">
-                  <span class="subheading mr-2" v-text="item.price"></span>
-                </v-row>
-              </v-list-item>
+              <v-btn text> Cari Sekarang </v-btn>
             </v-card-actions>
           </v-card>
+        </v-col>
 
-          <v-card v-if="item.status == 'Basic'" color="#D7CCC8">
-            <div class="d-flex flex-no-wrap justify-space-between">
-              <div>
-                <v-card-title v-text="item.title"></v-card-title>
+        <v-progress-linear
+          v-if="items.length == 0"
+          indeterminate
+          color="yellow darken-2"
+        ></v-progress-linear>
 
-                <v-card-subtitle v-text="item.detail"></v-card-subtitle>
-
-                <v-card-actions>
-                  <v-list-item class="grow">
-                    <v-list-item-avatar>
-                      <v-img class="elevation-6" :src="item.src"> </v-img>
-                    </v-list-item-avatar>
-
-                    <v-list-item-content>
-                      <v-list-item-title
-                        v-text="item.vendor"
-                      ></v-list-item-title>
-                    </v-list-item-content>
-
-                    <v-row align="center" justify="end">
-                      <span class="subheading mr-2" v-text="item.price"></span>
-                    </v-row>
-                  </v-list-item>
-                </v-card-actions>
-              </div>
-            </div>
-          </v-card>
+        <v-col v-for="(item, i) in items" :key="i" cols="12">
+          <CustomCard :item="item" />
         </v-col>
       </v-row>
+
+      <footer>
+        <p
+          class="text-center pt-2 mt-5"
+          style="border-top: 1px solid black; font-size: 12px"
+        >
+          Hope you have a nice and beautiful day
+        </p>
+      </footer>
     </v-container>
   </v-card>
 </template>
 
 <script>
+const axios = require("axios");
+import CustomCard from "@/components/Card.vue";
+import { Swiper, SwiperSlide } from "vue-awesome-swiper";
+import "swiper/swiper.min.css";
 export default {
   name: "Home",
+  components: {
+    CustomCard,
+    Swiper,
+    SwiperSlide,
+  },
   data: () => ({
-    item: {},
-    items: [
-      {
-        title: "Intimate Wedding Package",
-        detail: "Foster the People",
-        price: "IDR 19.000.000,-",
-        src: "https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShortCurly&accessoriesType=Prescription02&hairColor=Black&facialHairType=Blank&clotheType=Hoodie&clotheColor=White&eyeType=Default&eyebrowType=DefaultNatural&mouthType=Default&skinColor=Light",
-        vendor: "Jumbo Restaurant",
-        status: "Favorite",
-        img: "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
-        col: 12,
-      },
-      {
-        title: "Supermodel",
-        detail: "",
-        price: "IDR 2.500.000,-",
-        src: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-        vendor: "Foster the People",
-        status: "Basic",
-        col: 4,
-      },
-      {
-        title: "Halcyon Days",
-        detail: "",
-        price: "IDR 10.000.000,-",
-        src: "",
-        vendor: "Ellie Goulding",
-        status: "Basic",
-        col: 4,
-      },
-      {
-        title: "Halcyon Days",
-        detail: "",
-        price: "IDR 2.500.000",
-        src: "",
-        vendor: "Ellie Goulding",
-        status: "Basic",
-        col: 4,
-      },
+    cart: 2,
+    categories: [
+      "Ballroom",
+      "Makeup",
+      "Boutiqe",
+      "All in one",
+      "Ala Carte",
+      "Fashion",
     ],
+    swiperOption: {
+      slidesPerView: 4,
+      spaceBetween: 30,
+      freeMode: true,
+    },
+    item: {},
+    items: [],
   }),
+  methods: {
+    get_data: function () {
+      var app = this;
+      let url = "https://618f8e02f6bf45001748493a.mockapi.io/api/v1/packets";
+      axios.get(url).then((response) => {
+        app.items = response.data;
+        console.log(app.items);
+      });
+    },
+  },
+  created() {
+    this.get_data();
+  },
 };
 </script>
