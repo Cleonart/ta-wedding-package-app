@@ -42,7 +42,7 @@
         </p>
       </div>
 
-      <swiper :options="swiperOption">
+      <swiper :options="swiperOption" style="user-select: none">
         <swiper-slide v-for="categ in categories" :key="categ">
           <v-chip outlined>{{ categ }}</v-chip>
         </swiper-slide>
