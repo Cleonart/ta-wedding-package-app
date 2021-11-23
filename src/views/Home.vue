@@ -1,38 +1,6 @@
 <template>
   <v-card class="mx-auto" style="overflow-x: hidden">
-    <p
-      style="
-        font-family: 'Serif';
-        text-align: center;
-        border-bottom: 1px solid black;
-      "
-      class="py-3"
-    >
-      <img src="@/assets/pic.png" style="width: 120px" />
-
-      <v-avatar
-        style="
-          font-family: 'Sans-Serif';
-          position: absolute;
-          left: 15px;
-          top: 12px;
-        "
-        color="primary"
-        size="32"
-        ><img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John"
-      /></v-avatar>
-
-      <!-- Cart Badge [Top Right] -->
-      <v-badge
-        :content="cart"
-        :value="cart"
-        style="position: absolute; right: 15px; top: 15px"
-        color="red"
-        overlap
-      >
-        <v-icon medium> mdi-cart </v-icon>
-      </v-badge>
-    </p>
+    <Header />
     <v-container>
       <!-- Top Subtitle -->
       <div class="top-header mb-5">
@@ -97,12 +65,15 @@
 <script>
 const axios = require("axios");
 import CustomCard from "@/components/Card.vue";
+import Header from "@/components/Header.vue";
 import { Swiper, SwiperSlide } from "vue-awesome-swiper";
 import "swiper/swiper.min.css";
 export default {
   name: "Home",
   components: {
+
     CustomCard,
+    Header,
     Swiper,
     SwiperSlide,
   },

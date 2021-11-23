@@ -1,3 +1,4 @@
+
 <template>
   <v-card :color="item.color" dark>
     <div class="d-flex flex-no-wrap justify-space-between">
@@ -28,15 +29,14 @@
           {{ formatRupiah(item.price, "Rp. ") }}
         </v-card-subtitle>
         <v-card-actions>
-          <v-btn class="ml-2 mt-1 mb-3" outlined rounded small
-            >Buka Paket</v-btn
-          >
+          <v-btn @click="gotoDetail" class="ml-2 mt-1 mb-3" outlined rounded small>
+            Buka Paket
+            </v-btn>
         </v-card-actions>
       </div>
     </div>
   </v-card>
 </template>
-
 <script>
 export default {
   props: ["item"],
@@ -57,6 +57,13 @@ export default {
       rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
       return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
     },
+
+    gotoDetail(){
+      this.$router.push('/detail');
+    }
   },
 };
+
+
+
 </script>
