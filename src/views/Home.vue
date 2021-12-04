@@ -4,9 +4,19 @@
     <v-container>
       <!-- Top Subtitle -->
       <div class="top-header mb-5">
-        <h2 class="h1">Halo, Pengguna</h2>
+        <h2 class="h1">Halo, {{ session_user_name }}</h2>
         <p class="subtitle-2" style="opacity: 0.7; font-weight: normal">
           Your trusworthy wedding partner
+        </p>
+        <p class="subtitle-2" style="opacity: 0.7; font-weight: normal">
+          <v-icon
+            small
+            v-if="session_user_type == 'user'"
+            style="margin-right: 5px"
+            >mdi-account-multiple</v-icon
+          >
+          <v-icon small v-else style="margin-right: 5px">mdi-domain</v-icon>
+          Anda masuk sebagai {{ session_user_type }}
         </p>
       </div>
 
@@ -18,6 +28,7 @@
 
       <!-- Search Field -->
       <v-text-field
+        v-model="search_bar"
         label="Cari Kategori"
         required
         append-icon="mdi-magnify"
@@ -39,13 +50,27 @@
           </v-card>
         </v-col>
 
+        <v-col cols="12" v-if="session_user_type == 'vendor'">
+          <v-card color="#E4CDA7" light>
+            <v-card-title class="text-h6"> Tambahkan paket baru? </v-card-title>
+            <v-card-subtitle>
+              Silahkan tambahkan dan susun paket baru anda disini
+            </v-card-subtitle>
+            <v-card-actions>
+              <v-btn text @click="$router.replace('register_packet/new')">
+                Tambah Sekarang
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+
         <v-progress-linear
           v-if="items.length == 0"
           indeterminate
           color="yellow darken-2"
         ></v-progress-linear>
 
-        <v-col v-for="(item, i) in items" :key="i" cols="12">
+        <v-col v-for="(item, i) in filteredData" :key="i" cols="12">
           <CustomCard :item="item" />
         </v-col>
       </v-row>
@@ -67,11 +92,11 @@ const axios = require("axios");
 import CustomCard from "@/components/Card.vue";
 import Header from "@/components/Header.vue";
 import { Swiper, SwiperSlide } from "vue-awesome-swiper";
+import { API_ENDPOINT } from "../core.js";
 import "swiper/swiper.min.css";
 export default {
   name: "Home",
   components: {
-
     CustomCard,
     Header,
     Swiper,
@@ -87,6 +112,7 @@ export default {
       "Ala Carte",
       "Fashion",
     ],
+
     swiperOption: {
       slidesPerView: 4,
       spaceBetween: 30,
@@ -94,19 +120,61 @@ export default {
     },
     item: {},
     items: [],
+
+    search_bar: "",
+
+    session_user_id: false,
+    session_user_type: false,
+    session_user_name: false,
   }),
+  computed: {
+    filteredData() {
+      return this.items.filter((tableData) => {
+        return tableData.title
+          .toLowerCase()
+          .includes(this.search_bar.toLowerCase());
+      });
+    },
+  },
   methods: {
     get_data: function () {
-      var app = this;
-      let url = "https://618f8e02f6bf45001748493a.mockapi.io/api/v1/packets";
-      axios.get(url).then((response) => {
-        app.items = response.data;
-        console.log(app.items);
+      let app = this;
+      let url = API_ENDPOINT + "api/v1/model/master.packet/read";
+
+      // use domain to search only products that related to vendor_id
+      let domain = [];
+      if (this.session_user_type == "vendor") {
+        domain = [["vendor_id", "=", parseInt(app.session_user_id)]];
+      }
+
+      // Payload for odoo
+      let payload = {
+        params: {
+          domain: domain,
+        },
+      };
+
+      axios.post(url, payload).then((response) => {
+        app.items = response.data.result.records;
+        //console.log(app.items);
+        console.log(response);
       });
     },
   },
   created() {
+    this.session_user_id = sessionStorage.getItem("session");
+    this.session_user_type = sessionStorage.getItem("session_type");
+    this.session_user_name = sessionStorage.getItem("session_user_name");
+
+    if (this.session_user_id == "null" || this.session_user_id == null) {
+      this.$router.replace("login");
+      alert("Waktu login anda telah habis, silahkan login kembali!");
+    }
+
     this.get_data();
+  },
+  mounted() {
+    window.scrollTo(0, 0);
   },
 };
 </script>

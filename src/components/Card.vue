@@ -1,4 +1,3 @@
-
 <template>
   <v-card :color="item.color" dark>
     <div class="d-flex flex-no-wrap justify-space-between">
@@ -20,7 +19,7 @@
           ><v-icon small color="white darken-2" class="mr-2 -mt-1">
             mdi-domain
           </v-icon>
-          {{ item.vendor }}
+          {{ item.vendor_name }}
         </v-card-subtitle>
         <v-card-subtitle class="mt-0 pt-1"
           ><v-icon small color="white darken-2" class="mr-2 -mt-1">
@@ -29,9 +28,15 @@
           {{ formatRupiah(item.price, "Rp. ") }}
         </v-card-subtitle>
         <v-card-actions>
-          <v-btn @click="gotoDetail" class="ml-2 mt-1 mb-3" outlined rounded small>
+          <v-btn
+            @click="gotoDetail(item.id)"
+            class="ml-2 mt-1 mb-3"
+            outlined
+            rounded
+            small
+          >
             Buka Paket
-            </v-btn>
+          </v-btn>
         </v-card-actions>
       </div>
     </div>
@@ -58,12 +63,13 @@ export default {
       return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
     },
 
-    gotoDetail(){
-      this.$router.push('/detail');
-    }
+    gotoDetail(id) {
+      if (sessionStorage.getItem("session_type") == "user") {
+        this.$router.replace("/detail/" + id);
+      } else if (sessionStorage.getItem("session_type") == "vendor") {
+        this.$router.replace("/register_packet/" + id);
+      }
+    },
   },
 };
-
-
-
 </script>
