@@ -46,6 +46,12 @@
         label="Alamat Pengguna"
         required
       ></v-text-field>
+      <v-text-field
+        v-model="user.contact"
+        :counter="20"
+        label="Kontak Pengguna"
+        required
+      ></v-text-field>
       <v-btn color="primary" elevation="2" @click="register" :loading="loader"
         >Daftar</v-btn
       >
@@ -71,6 +77,7 @@ export default {
         name: "",
         type: "",
         address: "",
+        contact: "",
       },
       dialog: false,
       dialog_txt: "This is snackbar",
@@ -97,6 +104,12 @@ export default {
       if (this.user.type == "") {
         app.dialog = true;
         app.dialog_txt = "Tipe tidak boleh kosong";
+        return;
+      }
+
+      if (this.user.contact == "") {
+        app.dialog = true;
+        app.dialog_txt = "Nomor Kontak tidak boleh kosong";
         return;
       }
 

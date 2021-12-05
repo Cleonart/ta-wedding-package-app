@@ -8,6 +8,7 @@ import Detail from "../views/Detail.vue";
 import RegisterPacket from "../views/RegisterPacket.vue";
 import Checkout from "../views/Checkout.vue";
 import ShoppingCart from "../views/ShoppingCart.vue";
+import PacketBooking from "../views/DetailOnVendor.vue";
 
 Vue.use(VueRouter);
 
@@ -41,6 +42,11 @@ const routes = [
     path: "/register_packet/:id",
     name: "Packet Register",
     component: RegisterPacket,
+  },
+  {
+    path: "/booking/:id",
+    name: "Packet Booking",
+    component: PacketBooking,
   },
   {
     path: "/checkout",

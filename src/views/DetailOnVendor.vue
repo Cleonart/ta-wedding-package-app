@@ -110,16 +110,14 @@
 
         <v-card-actions>
           <v-btn
-            color="primary"
+            color="green"
             elevation="2"
             class="ml-2 mb-2"
             @click="register"
             :loading="loader"
-            v-if="booking.status_booking != 'confirmed'"
-            >Booking</v-btn
+            >Konfirmasi</v-btn
           >
           <v-btn
-            v-if="booking.status_booking == 'waiting'"
             color="error"
             elevation="2"
             class="ml-2 mb-2"
@@ -168,7 +166,6 @@ export default {
         packet_id: "",
         user_id: "",
         vendor_id: "",
-        status_booking: "",
       },
       date: "",
       items: {},
@@ -200,48 +197,20 @@ export default {
       this.booking.packet_id = this.packet_id;
       this.booking.vendor_id = this.items.vendor_id;
 
-      // Payload for odoo
-      let args_data = [];
-      let endpoint = "";
-      if (this.register_type < 0) {
-        endpoint = "create";
-        args_data = [
-          [
-            {
-              ...app.booking,
-            },
-          ],
-        ];
-      } else if (this.register_type > 0) {
-        endpoint = "write";
-        args_data = [
-          this.register_type,
-          {
-            ...app.booking,
-          },
-        ];
-      }
-
       let payload = {
         params: {
-          args: args_data,
+          args: [this.booking.id],
           kwargs: {},
         },
       };
 
       app.loader = true;
-      let DEFAULT_END =
-        API_ENDPOINT + "api/v1/model/master.booking/" + endpoint;
+      let DEFAULT_END = API_ENDPOINT + "api/v1/model/master.booking/confirm";
       axios.post(DEFAULT_END, payload).then((response) => {
         let data = response.data;
         console.log(response);
         app.dialog = true;
-        if (this.register_type <= 0) {
-          app.dialog_txt = "Paket ditambahkan dalam daftar booking";
-          app.$router.replace("/");
-        } else if (this.register_type > 0) {
-          app.dialog_txt = "Paket booking berhasil diubah";
-        }
+        app.dialog_txt = "Paket berhasil dikonfirmasi";
         app.loader = false;
       });
     },
@@ -265,49 +234,29 @@ export default {
       });
     },
 
-    get_data: function (id) {
+    get_book_data: function (id) {
       let app = this;
       let payload = {
         params: {
-          args: [
-            id,
-            {
-              user_id: sessionStorage.getItem("session"),
-            },
-          ],
+          domain: [["id", "=", id]],
+          args: [],
           kwargs: {},
         },
       };
-      let DEFAULT_END = API_ENDPOINT + "api/v1/model/master.packet/get_details";
+
+      let DEFAULT_END = API_ENDPOINT + "api/v1/model/master.booking/read";
       axios.post(DEFAULT_END, payload).then((response) => {
-        app.items = response.data.result[0];
+        app.items = response.data.result.records[0];
         console.log(response);
-        var obj = app.items;
-        if ("user_id" in obj) {
-          app.register_type = app.items.id;
-          app.items = response.data.result[0];
-          app.booking = response.data.result[0];
-        } else {
-          app.register_type = -1;
-        }
+        app.register_type = app.items.id;
+        app.booking = app.items;
       });
     },
   },
   created() {
     let id = this.$route.params.id;
     this.packet_id = id;
-    this.get_data(id);
-  },
-
-  created() {
-    if (this.$route.params.id == "new") {
-      this.register_type = -1;
-    } else {
-      this.register_type = parseInt(this.$route.params.id);
-      let id = this.$route.params.id;
-      this.packet_id = id;
-      this.get_data(this.register_type);
-    }
+    this.get_book_data(id);
   },
   mounted() {
     window.scrollTo(0, 0);

@@ -2,33 +2,34 @@
   <v-card class="mx-auto" style="overflow-x: hidden">
     <Header />
 
-    <v-list-item three-line>
-      <v-list-item-content>
-        <v-list-item-subtitle class="text-h6" style="margin-top: 5px">
-          Kristian Dame
-        </v-list-item-subtitle>
+    <div style="margin-left: 20px">
+      <h2 class="h1">Daftar pesanan</h2>
+      <p class="subtitle-2" style="opacity: 0.7; font-weight: normal">
+        Silahkan cek daftar pesanan anda disini
+      </p>
+      <p class="subtitle-2" style="opacity: 0.7; font-weight: normal">
+        <v-icon
+          small
+          v-if="session_user_type == 'user'"
+          style="margin-right: 5px"
+          >mdi-account-multiple</v-icon
+        >
+        <v-icon small v-else style="margin-right: 5px">mdi-domain</v-icon>
+        Anda masuk sebagai {{ session_user_type }}
+      </p>
+    </div>
 
-        <v-list-item-title class="text-caption mt-1">
-          0821786761408
-        </v-list-item-title>
-      </v-list-item-content>
-
-      <v-btn class="ml-2 mr-2" fab dark x-small color="#212121">
-        <v-icon dark> mdi-pencil </v-icon>
-      </v-btn>
-    </v-list-item>
-
+    <v-progress-linear
+      v-if="items.length == 0"
+      indeterminate
+      color="yellow darken-2"
+    ></v-progress-linear>
     <!-- Pilihan -->
-
     <v-container>
       <v-row dense>
         <v-col v-for="(item, i) in items" :key="i" cols="12">
-          <v-card color="#212121" dark>
+          <v-card color="#212121" dark @click="go_to(item)">
             <v-list-item three-line>
-              <v-list-item-avatar tile size="80">
-                <v-img :src="item.src"></v-img>
-              </v-list-item-avatar>
-
               <v-list-item-content>
                 <v-list-item-title
                   v-text="item.title"
@@ -37,107 +38,103 @@
                 </v-list-item-title>
 
                 <v-list-item-subtitle
-                  v-text="'by ' + item.vendor"
+                  v-text="'by ' + item.vendor_name"
                   class="text-caption"
-                  style="margin-top: -10px"
+                  style="margin-top: 0px"
                 >
                 </v-list-item-subtitle>
-                <div v-text="item.price" class="text-overline"></div>
+                <div
+                  v-text="formatRupiah(item.price, 'Rp.')"
+                  class="text-overline"
+                ></div>
               </v-list-item-content>
-
-              <v-btn class="ml-2 mr-2" fab dark x-small color="yellow darken-3">
-                <v-icon dark> mdi-delete </v-icon>
-              </v-btn>
             </v-list-item>
           </v-card>
         </v-col>
       </v-row>
-
-      <!-- Checkout -->
-
-      <div class="ml-1 mt-5">
-        <p class="font-weight-bold">Checkout</p>
-      </div>
-
-      <v-card style="margin-top: 10px" color="#F9A825" dark>
-        <div style="margin-left: 10px">
-          <p class="text-button font-weight-bold">TOTAL</p>
-          <p
-            style="margin-top: -20px; margin-bottom: -10px"
-            class="font-weight-bold"
-          >
-            IDR 13,000,000
-          </p>
-        </div>
-        <v-list-group
-          style="margin-left: -20px"
-          :value="false"
-          no-action
-          sub-group
-        >
-          <template v-slot:activator>
-            <v-list-item-content>
-              <v-list-item-title>Payment</v-list-item-title>
-            </v-list-item-content>
-          </template>
-
-          <v-list-item v-for="([title, icon], i) in payment" :key="i" link>
-            <v-list-item-title v-text="title"></v-list-item-title>
-
-            <v-list-item-icon>
-              <v-icon v-text="icon"></v-icon>
-            </v-list-item-icon>
-          </v-list-item>
-        </v-list-group>
-      </v-card>
     </v-container>
-
-    <v-bottom-navigation v-model="value">
-      <v-btn value="recent">
-        <span>Book Now</span>
-
-        <v-icon>mdi-ring</v-icon>
-      </v-btn>
-    </v-bottom-navigation>
-
-    <footer>
-      <p
-        class="text-center pt-2 mt-5"
-        style="border-top: 1px solid black; font-size: 12px"
-      >
-        Hope you have a nice and beautiful day
-      </p>
-    </footer>
   </v-card>
 </template>
 
 <script>
 import Header from "@/components/Header.vue";
+import { API_ENDPOINT } from "../core.js";
+var axios = require("axios");
+
 export default {
   components: {
     Header,
   },
   data: () => ({
-    items: [
-      {
-        src: "https://cdn.vuetifyjs.com/images/cards/foster.jpg",
-        title: "Nikah Jumbo",
-        vendor: "Jumbo Restaurant",
-        price: "IDR 5,000,000",
-      },
-      {
-        src: "https://cdn.vuetifyjs.com/images/cards/halcyon.png",
-        title: "Bapesta",
-        vendor: "Rumah Alam",
-        price: "IDR 8,000,000",
-      },
-    ],
+    session_user_id: false,
+    session_user_type: false,
+    session_user_name: false,
 
-    selectedPayment: 1,
-    payment: [
-      ["Cash", "mdi-cash-multiple"],
-      ["Card", "mdi-credit-card-multiple-outline"],
-    ],
+    items: [],
   }),
+  methods: {
+    formatRupiah: function (angka, prefix) {
+      angka = angka.toString();
+      var number_string = angka.replace(/[^,\d]/g, "").toString();
+      var split = number_string.split(",");
+      var sisa = split[0].length % 3;
+      var rupiah = split[0].substr(0, sisa);
+      var ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+      var separator;
+      // tambahkan titik jika yang di input sudah menjadi angka ribuan
+      if (ribuan) {
+        separator = sisa ? "." : "";
+        rupiah += separator + ribuan.join(".");
+      }
+      rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+      return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
+    },
+    go_to: function (id) {
+      if (this.session_user_type == "user") {
+        this.$router.replace("/detail/" + id.packet_id[0]);
+      } else if (this.session_user_type == "vendor") {
+        this.$router.replace("/booking/" + id.id);
+      }
+    },
+    get_data: function () {
+      let app = this;
+      let url = API_ENDPOINT + "api/v1/model/master.booking/read";
+
+      // use domain to search only products that related to vendor_id
+      let domain = [];
+      if (this.session_user_type == "vendor") {
+        domain = [["vendor_id", "=", parseInt(app.session_user_id)]];
+      } else if (this.session_user_type == "user") {
+        domain = [["user_id", "=", parseInt(app.session_user_id)]];
+      }
+
+      // Payload for odoo
+      let payload = {
+        params: {
+          domain: domain,
+        },
+      };
+
+      axios.post(url, payload).then((response) => {
+        app.items = response.data.result.records;
+        console.log(response);
+      });
+    },
+  },
+  created() {
+    this.session_user_id = sessionStorage.getItem("session");
+    this.session_user_type = sessionStorage.getItem("session_type");
+    this.session_user_name = sessionStorage.getItem("session_user_name");
+
+    if (this.session_user_id == "null" || this.session_user_id == null) {
+      this.$router.replace("login");
+      alert("Waktu login anda telah habis, silahkan login kembali!");
+    }
+
+    this.get_data();
+  },
+  mounted() {
+    window.scrollTo(0, 0);
+  },
 };
 </script>
