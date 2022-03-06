@@ -186,7 +186,7 @@ export default {
         },
       };
 
-      let DEFAULT_END = API_ENDPOINT + "api/v1/model/master.packet/read";
+      let DEFAULT_END = API_ENDPOINT + "api/v1/model/master.packet/search_read";
       axios.post(DEFAULT_END, payload).then((response) => {
         app.packet = response.data.result.records[0];
         console.log(response);

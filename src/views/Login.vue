@@ -76,7 +76,7 @@ export default {
       };
 
       app.loader = true;
-      let DEFAULT_END = API_ENDPOINT + "api/v1/model/ta.account/read";
+      let DEFAULT_END = API_ENDPOINT + "api/v1/model/ta.account/search_read";
       axios.post(DEFAULT_END, payload).then((response) => {
         let data = response.data.result.records;
         if (data.length > 0) {

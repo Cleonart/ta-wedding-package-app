@@ -98,7 +98,7 @@ export default {
     },
     get_data: function () {
       let app = this;
-      let url = API_ENDPOINT + "api/v1/model/master.booking/read";
+      let url = API_ENDPOINT + "api/v1/model/master.booking/search_read";
 
       // use domain to search only products that related to vendor_id
       let domain = [];

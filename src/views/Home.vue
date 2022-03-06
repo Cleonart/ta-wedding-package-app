@@ -139,7 +139,7 @@ export default {
   methods: {
     get_data: function () {
       let app = this;
-      let url = API_ENDPOINT + "api/v1/model/master.packet/read";
+      let url = API_ENDPOINT + "api/v1/model/master.packet/search_read";
 
       // use domain to search only products that related to vendor_id
       let domain = [];

@@ -244,7 +244,7 @@ export default {
         },
       };
 
-      let DEFAULT_END = API_ENDPOINT + "api/v1/model/master.booking/read";
+      let DEFAULT_END = API_ENDPOINT + "api/v1/model/master.booking/search_read";
       axios.post(DEFAULT_END, payload).then((response) => {
         app.items = response.data.result.records[0];
         console.log(response);
