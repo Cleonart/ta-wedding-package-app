@@ -29,7 +29,7 @@
         </v-card-subtitle>
         <v-card-actions>
           <v-btn
-            @click="gotoDetail(item.id)"
+            @click="gotoDetail(item)"
             class="ml-2 mt-1 mb-3"
             outlined
             rounded
@@ -63,12 +63,18 @@ export default {
       return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
     },
 
-    gotoDetail(id) {
-      if (sessionStorage.getItem("session_type") == "user") {
-        this.$router.replace("/detail/" + id);
-      } else if (sessionStorage.getItem("session_type") == "vendor") {
-        this.$router.replace("/register_packet/" + id);
+    gotoDetail(item) {
+      const user_type = sessionStorage.getItem("session_type")
+      if (user_type == "user") {
+        this.$router.replace("/detail/" + item.id);
+      } else if (user_type == "vendor") {
+        this.$router.replace("/register_packet/" + item.id);
       }
+      else if (user_type == "admin"){
+        this.$router.replace("/register_packet/" + item.id);
+        sessionStorage.setItem("session", parseInt(item.vendor_id[0]));
+      }
+      
     },
   },
 };

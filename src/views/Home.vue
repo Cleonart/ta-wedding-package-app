@@ -146,6 +146,9 @@ export default {
       if (this.session_user_type == "vendor") {
         domain = [["vendor_id", "=", parseInt(app.session_user_id)]];
       }
+      else if (this.session_user_type == "admin"){
+        domain = []
+      }
 
       // Payload for odoo
       let payload = {

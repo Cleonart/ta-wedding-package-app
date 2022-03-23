@@ -61,7 +61,18 @@
           elevation="2"
           :loading="loader"
           @click="register"
-          >Daftar</v-btn
+        >
+          <span v-if="$route.params.id == 'new'">Daftar</span>
+          <span v-else>Edit</span>
+        </v-btn>
+        <v-btn
+          v-if="$route.params.id != 'new' && session_type == 'admin'"
+          class="mt-2 ml-2"
+          color="error"
+          elevation="2"
+          :loading="loader"
+          @click="unlink"
+          >Hapus Paket</v-btn
         >
         <p
           style="
@@ -111,6 +122,7 @@ export default {
       dialog_txt: "This is snackbar",
 
       register_type: "",
+      session_type: "",
       loader: false,
     };
   },
@@ -170,6 +182,7 @@ export default {
           app.$router.replace("/");
         } else if (this.register_type > 0) {
           app.dialog_txt = "Paket berhasil diubah";
+          app.$router.replace("/");
         }
         app.loader = false;
       });
@@ -192,6 +205,34 @@ export default {
         console.log(response);
       });
     },
+
+    unlink: function () {
+      let text = "Anda yakin ingin menghapus paket ini?";
+      if (confirm(text) == true) {
+        const id = this.$route.params.id;
+        let app = this;
+        let payload = {
+          params: {
+            args: [id],
+            kwargs: {},
+          },
+        };
+
+        let DEFAULT_END = API_ENDPOINT + "api/v1/model/master.packet/unlink";
+        axios.post(DEFAULT_END, payload).then((response) => {
+          if (response.data.result != true) {
+            app.dialog = true;
+            app.dialog_txt = response.data.result;
+          } else {
+            app.dialog = true;
+            app.dialog_txt = "Paket berhasil dihapus!";
+            setTimeout(function () {
+              app.$router.replace("/");
+            }, 1500);
+          }
+        });
+      }
+    },
   },
   created() {
     if (this.$route.params.id == "new") {
@@ -200,6 +241,7 @@ export default {
       this.register_type = parseInt(this.$route.params.id);
       this.get_data(this.register_type);
     }
+    this.session_type = sessionStorage.getItem("session_type");
     this.packet.vendor_id = parseInt(sessionStorage.getItem("session"));
   },
   mounted() {

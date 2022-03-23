@@ -56,6 +56,7 @@ export default {
     return {
       dialog: false,
       dialog_txt: true,
+      cart: []
     };
   },
   methods: {
